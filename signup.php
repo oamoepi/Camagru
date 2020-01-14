@@ -1,4 +1,8 @@
+<?php session_start();
 
+if(isset($_SESSION['userUid']) && isset($_SESSION['userEmail'])) 
+	header("Location: home.php");
+?>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -15,6 +19,7 @@
                     <ul>
                         <li><a href="index.php">Home</a></li>
                         <li><a href="about.php">About</a></li>
+						<li><a href="view.php">Gallery</a></li>
 						<li><a href="services.php">services</a></li>
 						<li class="current"><a href="signup.php">Register</a></li>
                        
@@ -107,7 +112,7 @@
 									</select>
 							</div><br>	
 				<input type="email" placeholder="email" name="email" >
-				<input type="password" placeholder="Password" name="Password">
+				<input type="password" placeholder="Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" name="Password">
 				<input type="password" placeholder="Confirm Password" name="ConfirmPassword">
 				<input type="submit" name="sign-up" value="Sign Up">
 				<a href="index.php"><button class="button_1" type="button">Already Have An Account</button></a>

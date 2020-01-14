@@ -1,10 +1,12 @@
 <?php 
-include '../config/connection.php';
+session_start();
+include '../config/database.php';
 
 if (isset($_POST['recoverpassword-submit']))
 {
 	$email = $_POST['email'];
 	$token =  bin2hex(random_bytes(8));
+	$UserName = $_SESSION['userUid'];
 
 	try
 	{
@@ -48,7 +50,9 @@ if (isset($_POST['recoverpassword-submit']))
 				{
 					echo "<div>Email already in use.";
 				}
+				header("location: ../index.php");
 				exit();
+
 			}
 			else
 			{

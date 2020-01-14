@@ -1,12 +1,12 @@
 
 <?php
 session_start();
-include 'config/connection.php';
+require 'config/database.php';
 
 if(isset($_POST['sign-in']))
 {
    
-    include 'config/connection.php';
+    
 
    $mailuid = $_POST['uid'];
    $password = $_POST['pwd'];
@@ -22,7 +22,7 @@ if(isset($_POST['sign-in']))
        try
        {
               
-               $sql = "SELECT * FROM users WHERE Username=? OR Email=?;";
+               $sql = "SELECT * FROM users WHERE UserName=? OR email=?;";
                $stmt = $conn->prepare($sql);
                $stmt->bindParam(1, $mailuid);
                $stmt->bindParam(2, $mailuid);
@@ -34,18 +34,31 @@ if(isset($_POST['sign-in']))
                    if($pwdcheck == true)
                    {
                        $_SESSION['userId'] = $row['id'];
-                       $_SESSION['userUid'] = $row['Username'];
-                       header("location: home.php?login=loginsuccess");
-                       exit();
+                       $_SESSION['userUid'] = $row['UserName'];
+                       $_SESSION['userEmail'] = $row['email'];
+
+                       
+
+                       if ($row['verified'] == '0')
+                       {
+                           header ('Location: index.php?Account=NotVerified');
+                           exit();
+                       }
+                       else
+                       {
+                          
+                         header('location: home.php?login=loginsuccess');
+                         exit();
+                       }
                    }
                    else if($pwdcheck == false)
                    {
-                       header("location: index.php?error=wrongpwd");
+                       header("location: index.php?error1=wrongpwd");
                        exit();
                    }
                    else
                    {
-                       header("location: index.php?error=wrongpwd");
+                       header("location: index.php?error1=wrongpwd");
                        exit();
                    }
                }
@@ -53,7 +66,7 @@ if(isset($_POST['sign-in']))
                {
                    if($row['uidUsers'] !== $mailuid)
                    {
-                       header("location: index.php?error=nouser");
+                       header("location: index.php?error2=nouser");
                        exit();
                    }
                }
@@ -69,6 +82,6 @@ if(isset($_POST['sign-in']))
 }
 else
 {
-   header("location: index.php");
-   exit(); 
+//    header("location: index.php");
+//    exit(); 
  }

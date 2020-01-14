@@ -1,7 +1,15 @@
 <?php
     session_start();
-    include_once 'config/config.php';
-?>
+    
+    
+    require 'config/database.php';
+    require 'function.php';
+    date_default_timezone_set('Africa/Johannesburg');
+    // include 'php/comments.inc.php';
+    // include "function.php";
+    // if(!(isset($_SESSION['userUid']) && isset($_SESSION['userEmail']))) 
+    // header("Location: index.php");
+    ?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -11,7 +19,8 @@
         <meta name="keywords" content="Camagru, Social media, camagru42">
         <title>Services</title>
         <link rel="stylesheet" href="css/main.css">
-        <link rel="stylesheet" href="css/main2.css">
+        <!-- <link rel="stylesheet" href="css/main2.css"> -->
+        <link rel="stylesheet" type="text/css" href="css/comments.css">
     </head>
     <body>
         <header>
@@ -53,15 +62,82 @@
 
         <aside id="sidebar">
                     <div class="booth">
-                        <video id="video" width="300" height="300"></video>
-                        <button id="capture" class="booth-capture-button" name="capture-image">Capture Image</button>
-                        <canvas id="canvas" width="300" height="300"></canvas>
-                        <img id="photo" src="http://placekitten.com//300/300" alt="Captured Image">
-
-
+                    <div class="video-wrap">
+                        <video id="video" autoplay></video>
                     </div>
-                    <script src="js/photo.js"></script>
-                </aside>
+                    <div class="controller">
+                        <button id="snap" class="booth-capture-button">Capture Image</button>
+                        <canvas id="canvas" width="300" height="300"></canvas>
+                        <!-- <img id="photo" src="http://placekitten.com//300/300" alt="Captured Image"> -->
+                        <form action="savecam.php" method="POST">
+                                <input type="hidden" id="image" name="img"> <br>
+                                <button onclick="save()" id="submit" name="upload">Save</button>
+                                <ul>
+                                    <li><label><img style="width: 100px;" onclick="merge(100,80,'./uploads/alphatest1.png')" src="uploads/alphatest1.png"></label></li>
+                                    <li><label><img style="width: 100px;" onclick="merge(40,80,'./uploads/alphatest2.png')" src="uploads/alphatest2.png"></label></li>
+                                    <li><label><img style="width: 100px;" onclick="merge(100,80,'./uploads/alphatest3.png')" src="uploads/alphatest3.png"></label></li>
+                                </ul>
+                            </form>
+                    </div>
+                    
+            <script>
+
+                            'use strict';
+                                
+                                const video = document.getElementById('video');
+                                const canvas = document.getElementById('canvas');
+                                const snap = document.getElementById('snap');
+                                const erorrMsgElement = document.getElementById('span#ErrorMsg');
+
+                                const constraints = {
+                                    audio: false,
+                                    video:{
+                                        width: 300, height: 300
+                                    }
+                                };
+                                
+                                // Access webcam
+                                async function init(){
+                                    try{
+                                        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                                        handleSuccess(stream);
+                                    }
+                                    catch(e){
+                                        erorrMsgElement.innerHTML = `navigator.getUserMedia.error:{$(e.toString())}`;
+                                    }
+                                }
+
+                                // success
+                                function handleSuccess(stream){
+                                    window.stream = stream;
+                                    video.srcObject = stream;
+                                }
+
+                                // load init
+                                init();
+                                // Draw image
+                                var context = canvas.getContext('2d');
+                                snap.addEventListener("click",function(){
+                                    context.drawImage(video, 0, 0, 300, 300);
+                                    console.log(photo.value);
+                                });
+
+                                const photo = document.getElementById('image');
+
+                                function merge(x, y, img)
+                                {
+                                    var new_img = new Image();
+                                    new_img.onload = function () {
+                                        context.drawImage(new_img, x, y, 50, 50);
+                                    }
+                                    new_img.src = img;
+                                }
+
+                                function save() {
+                                    photo.value = canvas.toDataURL();
+                                }
+            </script>
+        </aside>
 
         <table border="0">
                 <!-- <tr>
@@ -69,31 +145,89 @@
                     <th>Image</th>
                 </tr> -->
                 <?php
-                    $select = $conn->prepare("SELECT * FROM images ");
+                    $getcommlike = get_likescomment();
+
+
+                    $select = $conn->prepare("SELECT * FROM webcamimage ORDER BY idCamImage DESC");
                     $select->setFetchMode(PDO::FETCH_ASSOC);
                     $select->execute();
                     while($data=$select->fetch()){
                     ?>
                     <tr>
-                    <td><?php echo $data['id']; ?></td>
-                    <td><img src="uploads/<?php echo $data['image']; ?>" width="600" height="400">
-                    <input type="textbox" placeholder="Add Comments">
-                    <button class="button_1" type="submit" name="commented">Post</button>
-                    <a href="jquery/likes.jquery.php"><button class="button_1" type="submit" name="liked">Like</button></a>
+                    <td><?php echo $data['idCamImage']; ?></td>
+                    <td><img src="uploads/<?php echo $data['imgfullNameCam']; ?>" width="600" height="400">
+                        <form action='php/comments.inc.php' method='POST'>
+                            <input type='hidden' name='uid' value="<?php echo $data['imgfullNameCam']; ?>">
+                            <input type='hidden' name='date' value="<?php echo date('Y-m-d H:i:s'); ?>">
+                            <textarea name='message'></textarea><br>
+                            <button type='submit' name='commentSubmit'>Comment</button>
+                        </form>
+                    <?php
+                        if(isset($_GET['insert']) == "success")
+                        {
+                            $res = $data['imgfullNameCam'];
+                            $sql = "SELECT * FROM comments WHERE `uid`='$res' ORDER BY cid DESC";
+                            $result = $conn->prepare($sql);
+                            $result->execute();
+                            
+                            
+                             
+                            while ($row = $result->fetch(PDO::FETCH_ASSOC)) 
+                            { ?>
+                                
+                                <div class='comment-box'><p>
+                                <?php
+                                    echo $row['cid']."<br>";
+                                    echo $row['username']."<br>";
+                                    echo $row['message']."<br>";
+                                    echo $row['date']."<br>";
+                             
+                                    $comment = htmlspecialchars($row['message']);
+                                ?>
+                                </p>
+                                <form class='delete-form' method='POST'>
+                                    <input type='hidden' name='cid_id' value='<?php echo $row['cid']?>'>
+                                    <button type='submit' name='commentLike'>Like; <?PHP echo $row['like_count'] ?> </button>
+                                </form>
+                                </div>
+                                <?php
+                            }
+                        }
+
+                    ?>
                 </td>
-                <?php
+                <?php    
                 }?>
                 </tr>
-           
-                
         </table>
                 <a href="gallery.php">Add new image</a>
 
 
+<?php
+                        if(isset($_POST['commentLike']))
+                        { 
+                            
+                            $id_cid = $_POST['cid_id'];
+                            try
+                            {
+
+                            $sql = "UPDATE comments set like_count = like_count + 1 WHERE cid='$id_cid'";
+                            $result = $conn->prepare($sql);
+                            $result->execute();
+                            }
+                            catch(PDOException $e)
+                            {
+                                echo $e->getMessage();
+                            }
+                                
+                        }
+                       
+?>
+
  
+
         <footer>
             <p>amoepi@student.wethinkcode.co.za Copyright &copy; 2019</p>
         </footer>
-
     </body>
 </html>

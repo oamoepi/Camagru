@@ -1,4 +1,9 @@
+<?php session_start();
+require 'config/database.php';
 
+//  if(isset($_SESSION['userUid']) && isset($_SESSION['userEmail'])) 
+//  	header("Location: index.php");
+?>
 
 <!DOCTYPE html>
 <html>
@@ -19,6 +24,7 @@
                 <nav>
                     <ul>
                         <li class="current"><a href="index.php">Home</a></li>
+                        <li><a href="view.php">Gallery</a></li>
                         <li><a href="about.php">About</a></li>
                         <li><a href="services.php">Services</a></li>
                         <li><a href="signup.php">Register</a></li>
@@ -70,7 +76,25 @@ All captured images should be public, likeables and commentable.</p>
                         {
                             echo 'You have Signed out!';
                         }
+                        
+                        if(isset($_GET['Account']) == "NotVerified")
+                        {
+                            echo 'You have not verified your account';
+                        }
+                        if(isset($_GET['error']) == "emptyfields")
+                        {
+                            echo 'Fields are empty';
+                        }
+                        if(isset($_GET['error1']) == "wrongpwd")
+                        {
+                            echo 'You have entered an incorrect Password';
+                        }
+                        if(isset($_GET['error2']) == "nouser")
+                        {
+                            echo 'UserName could not be identified';
+                        }
                     ?>
+                
                       <h3>Sign In</h3>
                       <form class="quote" action="sign.inc.php" method="POST" >
                         <div>

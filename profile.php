@@ -1,3 +1,6 @@
+<?php session_start();
+    require_once('includes/auth.inc.php');
+?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -29,30 +32,31 @@
         <section id="newsletter">
                 <div class="container">
                     <h1>PROFILE</h1><br>
-                    <a href="functions/forgotpassword.php"><button class="button_1" type="button">Update Password</button></a> 
-                        <a href="php/signout.php"><button class="button_1" type="button">Update Email</button></a> 
+                    <a href="functions/forgotpassword.php"><button class="button_1" type="button" name="recoverpassword-submit">Update Password</button></a> 
+                        <a href="functions/updateemail.php"><button class="button_1" type="button" name="update">Update Email or UserName</button></a>  
                 </div>
         </section>
-
+<div style="overflow: scroll; height:800px; width:600px;">
             <table border="2">
                 <tr>
                     <th>ID</th>
                     <th>Image</th>
                 </tr>
                 <?php
-                    include "config/config.php";
-                    $select = $conn->prepare("SELECT * FROM images ");
+                    require 'config/database.php';
+                    $select = $conn->prepare("SELECT * FROM webcamimage ORDER BY idCamImage DESC");
                     $select->setFetchMode(PDO::FETCH_ASSOC);
                     $select->execute();
                     while($data=$select->fetch()){
                     ?>
                     <tr>
-                    <td><?php echo $data['id']; ?></td>
-                    <td><img src="uploads/<?php echo $data['image']; ?>" width="100" height="100"></td>
+                    <td><?php echo $data['idCamImage']; ?></td>
+                    <td><img src="uploads/<?php echo $data['imgfullNameCam']; ?>" width="100" height="100"></td>
                 <?php
                 }?>
                 </tr>
             </table>
+</div>
                 <a href="gallery.php">Add new image</a>
                 
 

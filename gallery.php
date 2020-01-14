@@ -1,7 +1,60 @@
-<?php
-session_start();
-    $_SESSION['username'] ="Admin,";
-?>
+<?php session_start();
+    require 'config/database.php';
+    require_once('includes/auth.inc.php');
+   
+
+    if(isset($_POST['submit']) && isset($_SESSION['userUid']) && isset($_SESSION['userEmail'])) 
+    { 
+        $user = $_SESSION['userUid'];
+        $tt = $_SESSION['userEmail'];
+
+        $folder ="uploads/"; 
+
+        $image = $_FILES['image']['name']; 
+
+        $path = $folder . $image ; 
+
+        $target_file=$folder.basename($_FILES["image"]["name"]);
+
+
+        $imageFileType=pathinfo($target_file,PATHINFO_EXTENSION);
+        $allowed=array('jpeg','png' ,'jpg'); $filename=$_FILES['image']['name']; 
+        $ext =pathinfo($filename, PATHINFO_EXTENSION); 
+
+        if(!in_array($ext,$allowed) ) 
+        { 
+
+            echo "Sorry, only JPG, JPEG, PNG & GIF  files are allowed.";
+
+        }
+        else
+        { 
+            move_uploaded_file( $_FILES['image'] ['tmp_name'], $path); 
+
+            try
+            {
+                $sql = " SELECT * FROM webcamimage";
+                $stmt = $conn->prepare($sql);
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                $setImageOrder = $result + 1;
+
+                $sql = "INSERT INTO `webcamimage` (imgfullNameCam, username, userEmail, likes_count, orderCamImage)  VALUES ('{$image}', '{$user}', '{$tt}', 0, '{$setImageOrder}')"; 
+                $stmt = $conn->prepare($sql);
+                var_dump($stmt->execute());
+
+                header("location: home.php?upload=success");
+                exit();
+            }
+            catch(PDOException $e)
+            {
+                echo $e->getMessage();
+            }
+
+        } 
+    } 
+
+    ?> 
+
 
 <!DOCTYPE html>
 <html>
@@ -49,15 +102,15 @@ session_start();
                     <th>Image</th>
                 </tr>
                 <?php
-                    include "config/connection.php";
-                    $select = $conn->prepare("SELECT * FROM images ");
+                    include 'config/database.php';
+                    $select = $conn->prepare("SELECT * FROM webcamimage");
                     $select->setFetchMode(PDO::FETCH_ASSOC);
                     $select->execute();
                     while($data=$select->fetch()){
                     ?>
                     <tr>
-                    <td><?php echo $data['id']; ?></td>
-                    <td><img src="uploads/<?php echo $data['image']; ?>" width="100" height="100"></td>
+                    <td><?php echo $data['idCamImage']; ?></td>
+                    <td><img src="uploads/<?php echo $data['imgfullNameCam']; ?>" width="100" height="100"></td>
                 <?php
                 }?>
                 </tr>
@@ -66,61 +119,15 @@ session_start();
                     <div class="gallery-container">
 
 
-                    <?php
-                        include("config/config.php");
-
-
-                        if(isset($_POST['submit'])) 
-
-                        { 
-
-                        $folder ="uploads/"; 
-
-                        $image = $_FILES['image']['name']; 
-
-                        $path = $folder . $image ; 
-
-                        $target_file=$folder.basename($_FILES["image"]["name"]);
-
-
-                        $imageFileType=pathinfo($target_file,PATHINFO_EXTENSION);
-
-
-                        $allowed=array('jpeg','png' ,'jpg'); $filename=$_FILES['image']['name']; 
-
-                        $ext=pathinfo($filename, PATHINFO_EXTENSION); if(!in_array($ext,$allowed) ) 
-
-                        { 
-
-                        echo "Sorry, only JPG, JPEG, PNG & GIF  files are allowed.";
-
-                        }
-
-                        else{ 
-                        move_uploaded_file( $_FILES['image'] ['tmp_name'], $path); 
-
-                        $stmt=$conn->prepare("INSERT INTO `images` (`image`) VALUES (:image)"); 
-
-                        $stmt->bindParam(':image',$image); 
-
-                        $stmt->execute(); 
-
-                        } 
-                        header("location: home.php?upload=success");
-                        } 
-
-                        ?> 
-
 
 
                         <form method="POST" enctype="multipart/form-data"> 
 
                         <input type="file" name="image" /> 
-
-                        <input type="submit" name="submit"/> 
-
+                        <input type="hidden" name="username" /> 
+                        <input type="hidden" name="useremail" /> 
+                        <button type="submit" name="submit"> Upload</button>
                         </form>
-
                         <a href="profile.php">See Image</a>
         <footer>
             <p>amoepi@student.wethinkcode.co.za Copyright &copy; 2019</p>

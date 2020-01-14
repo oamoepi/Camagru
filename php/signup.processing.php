@@ -1,6 +1,6 @@
 <?php 
 
-include "../config/config.php";
+require '../config/database.php';
 if (isset($_POST['sign-up']))
 {
     $FirstName = $_POST['FirstName'];
@@ -94,6 +94,8 @@ if (isset($_POST['sign-up']))
                 if(mail($recipient_email, $subject, $body, $headers))
                {
                    echo "<div = 'successMessage'>A verification email was sent to <b>" . $email . "</b>, please check your mailbox and follow the link to Signin.</div>";
+                   try
+                   {
                    $sql = "INSERT INTO `users` (`FirstName`, `LastName`, `UserName`, `Country`, `Gender`, `email`, `Password`, `token`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                    $stm = $conn->prepare($sql);
                    $hashpwd = password_hash($Password, PASSWORD_DEFAULT);
@@ -116,6 +118,12 @@ if (isset($_POST['sign-up']))
                    }
                    header("location: ../signup.php?signup=success");
                    exit();
+                }
+                catch (PDOException $e)
+                {
+                    
+                   echo $e->getMessage();
+                }
                }
                else
                {
@@ -126,8 +134,7 @@ if (isset($_POST['sign-up']))
        catch (PDOException $e)
        {
            
-           header("location: ../index.php?error=sqlerror");
-           exit();
+          echo $e->getMessage();
        }
     }
 }

@@ -9,7 +9,7 @@
 </head>
 <body>
 <?php
-    require_once '../config/database.php';
+    require 'config/database.php';
     
     if(isset($_GET['email']) && !empty($_GET['email']) AND isset($_GET['hash']) && !empty($_GET['hash'])){
         $email = $_GET['email'];

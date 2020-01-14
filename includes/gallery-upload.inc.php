@@ -6,23 +6,6 @@ if (isset($_POST['submit'])){
     $me = $_SESSION['userId'];
     $upload = "INSERT INTO posts (body, posted_at, user_id, likes) VALUES ('$image', 'THE DATE', '$me', '0')";
 
-    /* STEPS
-        make sure that the image gets uploaded.
-        once you have data in the posts table try and print it.
-
-        call me.
-
-
-
-
-
-
-
-
-
-
-
-    */
 
 
      $newFileName = $_POST['filename'];
@@ -53,7 +36,7 @@ if (isset($_POST['submit'])){
                  $imageFullName = $newFileName . "." . uniqid("", true) . "." . $fileActualExt;
                  $fileDestination = "../img/gallery/" . $imageFullName;
 
-                 include_once "config/config.php";
+                 include 'config/database.php';
                 if (empty($imageTitle) || empty($imageDesc)) {
                      header("Location: ../gallery.php?upload=empty");
                      exit();
@@ -63,29 +46,6 @@ if (isset($_POST['submit'])){
                      $stmt = $PDO->prepare($sql);
                      $stmt->execute($stmt, $sql);
                   }
-//                 //     $sql = "SELECT * FROM gallery;";
-//                 //     $stmt = mysqli_stmt_init($conn);
-//                 //     if (!mysqli_stmt_prepare($stmt, $sql)) {
-//                 //         echo "SQL statement failed!";
-//                 //     }else {
-//                 //         mysqli_stmt_execute($stmt);
-//                 //         $result = mysqli_stmt_get_result($stmt);
-//                 //         $rowCount = mysqli_num_rows($result);
-//                 //         $setImageOrder = $rowCount + 1;
-
-//                 //         $sql = "INSERT INTO gallery (titleGallery, descGallery, imgFullNameGallery, orderGallery) VALUES (?, ?, ?, ?);";
-//                 //         if (!mysqli_stmt_prepare($stmt, $sql)) {
-//                 //             echo "SQL statement failed!";
-//                 //         }else{
-//                 //             mysqli_stmt_bind_param($stmt, "ssss", $imageTitle, $imageDesc, $imageFullName, $setImageOrder);
-//                 //             mysqli_stmt_execute($stmt);
-
-//                 //             move_uploaded_file($fileTempName, $fileDestination);
-
-//                 //             header("Location: ../gallery.php?uploaded=success");
-//                 //         }
-                 //     }
-                 // }
              }else {
                  echo "File size is too large!";
                  exit();

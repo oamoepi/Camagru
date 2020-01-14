@@ -18,6 +18,7 @@
                     <ul>
                         <li><a href="index.php">Home</a></li>
                         <li class="current"><a href="about.php">About</a></li>
+                        <li><a href="view.php">Gallery</a></li>
                         <li><a href="services.php">services</a></li>
                         <li><a href="signup.php">Register</a></li>
                        
