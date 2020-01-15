@@ -66,9 +66,9 @@
                         <video id="video" autoplay></video>
                     </div>
                     <div class="controller">
-                        <button id="snap" class="booth-capture-button">Capture Image</button>
                         <canvas id="canvas" width="300" height="300"></canvas>
-                        <!-- <img id="photo" src="http://placekitten.com//300/300" alt="Captured Image"> -->
+                        <img id="photo" src="http://placekitten.com//300/300" alt="Captured Image"><br><br>
+                        <button id="snap" class="booth-capture-button">Capture Image</button>
                         <form action="savecam.php" method="POST">
                                 <input type="hidden" id="image" name="img"> <br>
                                 <button onclick="save()" id="submit" name="upload">Save</button>
@@ -140,10 +140,6 @@
         </aside>
 
         <table border="0">
-                <!-- <tr>
-                    <th>ID</th>
-                    <th>Image</th>
-                </tr> -->
                 <?php
                     $getcommlike = get_likescomment();
 
@@ -152,6 +148,7 @@
                     $select->setFetchMode(PDO::FETCH_ASSOC);
                     $select->execute();
                     while($data=$select->fetch()){
+                         $_SESSION['image_id'] = $data['idCamImage']; 
                     ?>
                     <tr>
                     <td><?php echo $data['idCamImage']; ?></td>
@@ -161,6 +158,10 @@
                             <input type='hidden' name='date' value="<?php echo date('Y-m-d H:i:s'); ?>">
                             <textarea name='message'></textarea><br>
                             <button type='submit' name='commentSubmit'>Comment</button>
+                        </form>
+                        <form  action="delete.php" method="POST">
+                            <input type="hidden" name="delete_id" value="<?php echo $data['imgfullNameCam']; ?>">
+                            <button type='POST' name="commentDelete" >Delete Image</button>
                         </form>
                     <?php
                         if(isset($_GET['insert']) == "success")

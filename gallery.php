@@ -102,6 +102,7 @@
                     <th>Image</th>
                 </tr>
                 <?php
+                    // require 'comment.inc.php';
                     include 'config/database.php';
                     $select = $conn->prepare("SELECT * FROM webcamimage");
                     $select->setFetchMode(PDO::FETCH_ASSOC);
@@ -110,7 +111,7 @@
                     ?>
                     <tr>
                     <td><?php echo $data['idCamImage']; ?></td>
-                    <td><img src="uploads/<?php echo $data['imgfullNameCam']; ?>" width="100" height="100"></td>
+                    <td><img src="uploads/<?php echo $data['imgfullNameCam']; ?>" width="100" height="100"><button >Delete Image</button></td>
                 <?php
                 }?>
                 </tr>
